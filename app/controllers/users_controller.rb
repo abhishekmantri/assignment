@@ -1,5 +1,7 @@
 class UsersController < ApplicationController
 
+  before_action :authenticate_user, only: [:logout]
+
   def login
     user_password = params[:password]
     username = params[:username]
@@ -21,6 +23,16 @@ class UsersController < ApplicationController
       render json: user, status: 200
     else
       render json: user.errors, status: 422
+    end
+  end
+
+  def logout
+    user = current_user
+    user.auth_expiry_time = nil
+    if user.save
+      render json: 'Logged out', status: 200
+    else
+      render json: 'Error in logging out', status: 400
     end
   end
 
